@@ -26,7 +26,7 @@ app.get('/', function(req, res){
     res.sendFile(path.join(__dirname, '../front/index.html'));
 })
 
-app.get('/login/user', function(req, res){
+app.get('/login', function(req, res){
     res.sendFile(path.join(__dirname, '../front/login.html'));
 })
 
