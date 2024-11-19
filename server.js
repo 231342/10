@@ -23,13 +23,19 @@ const db = mysql.createConnection({
     database: 'myapp' 
 });
 
-//메인 페이지
+//처음 접속 시 로그인 페이지
 app.get('/', function(req, res){
-    res.sendFile(path.join(__dirname, '../front/index.html'));
+    res.sendFile(path.join(__dirname, '../front/login1.html'));
 })
 
-app.get('/login', function(req, res){
-    res.sendFile(path.join(__dirname, '../front/login.html'));
+//메인 페이지
+app.get('/main', function(req, res){
+    res.sendFile(path.join(__dirname, '../front/elements.html'));
+})
+
+// 회원가입 (일반 or 동아리장) 선택 화면
+app.get('/register', function(req, res){
+    res.sendFile(path.join(__dirname, '../front/signup1.html'));
 })
 
 // 일반 사용자 회원가입
@@ -64,6 +70,10 @@ app.post('/register/user', async (req, res) => {
 
 
 // 관리자 회원가입
+app.get('/register/admin', function(req, res){
+    res.sendFile(path.join(__dirname, '../front/admin_login.html'));
+})
+
 app.post('/register/admin', async (req, res) => {
     const { email, password } = req.body;
 
@@ -95,6 +105,10 @@ app.post('/register/admin', async (req, res) => {
 
 
 // 일반 사용자 로그인
+app.get('/login/user', function(req, res){
+    res.sendFile(path.join(__dirname, '../front/user_login.html'));
+})
+
 app.post('/login/user', async (req, res) => {
     const { email, password } = req.body;
 
@@ -134,6 +148,10 @@ app.post('/login/user', async (req, res) => {
 
 
 // 관리자 로그인
+app.get('/login/admin', function(req, res){
+    res.sendFile(path.join(__dirname, '../front/admin_signup.html'));
+})
+
 app.post('/login/admin', async (req, res) => {
     const { email, password } = req.body;
 
@@ -208,7 +226,11 @@ app.get('/search', async (req, res) => {
     }
 });
 // 새 비밀번호 설정 API
-app.post('/password-reset', async (req, res) => {
+app.get('/reset_password', function(req, res){
+    res.sendFile(path.join(__dirname, '../front/reset_password.html'));
+})
+
+app.post('/reset_password', async (req, res) => {
     const { email, newPassword } = req.body;
 
     if (!email || !newPassword) {
