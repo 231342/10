@@ -261,11 +261,162 @@ app.post('/reset_password', async (req, res) => {
     }
 });
 
+app.post('/posts', async (req, res) => {
+    const { title, content, author_id, club_id } = req.body;
+
+    try {
+        // 동아리장 여부 확인
+        const [user] = await db.promise().execute('SELECT is_admin FROM users WHERE id = ?', [author_id]);
+        if (user.length === 0 || user[0].is_admin === 0) {
+            return res.status(403).json({ message: '게시글 작성 권한이 없습니다.' });
+        }
+
+        // 게시글 생성
+        const [result] = await db.promise().execute(
+            'INSERT INTO posts (title, content, author_id, club_id) VALUES (?, ?, ?, ?)',
+            [title, content, author_id, club_id]
+        );
+
+        res.status(201).json({ message: '게시글이 성공적으로 생성되었습니다.', post_id: result.insertId });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: '서버 오류' });
+    }
+});
+
+app.put('/posts/:id', async (req, res) => {
+    const { id } = req.params;
+    const { title, content, author_id } = req.body;
+
+    try {
+        // 동아리장 여부 확인
+        const [user] = await db.promise().execute('SELECT is_admin FROM users WHERE id = ?', [author_id]);
+        if (user.length === 0 || user[0].is_admin === 0) {
+            return res.status(403).json({ message: '게시글 수정 권한이 없습니다.' });
+        }
+
+        // 게시글 수정
+        await db.promise().execute('UPDATE posts SET title = ?, content = ? WHERE id = ?', [title, content, id]);
+        res.json({ message: '게시글이 성공적으로 수정되었습니다.' });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: '서버 오류' });
+    }
+});
+
+app.delete('/posts/:id', async (req, res) => {
+    const { id } = req.params;
+    const { author_id } = req.body;
+
+    try {
+        // 동아리장 여부 확인
+        const [user] = await db.promise().execute('SELECT is_admin FROM users WHERE id = ?', [author_id]);
+        if (user.length === 0 || user[0].is_admin === 0) {
+            return res.status(403).json({ message: '게시글 삭제 권한이 없습니다.' });
+        }
+
+        // 게시글 삭제
+        await db.promise().execute('DELETE FROM posts WHERE id = ?', [id]);
+        res.json({ message: '게시글이 성공적으로 삭제되었습니다.' });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: '서버 오류' });
+    }
+});
+
+// 게시물 목록 조회 API
+app.get('/posts', async (req, res) => {
+    try {
+        const [posts] = await db.promise().execute(`
+            SELECT 
+                posts.id, 
+                posts.title, 
+                posts.created_at, 
+                posts.updated_at,
+                users.email AS author_email,
+                clubs.name AS club_name
+            FROM posts
+            JOIN users ON posts.author_id = users.id
+            JOIN clubs ON posts.club_id = clubs.id
+        `);
+        res.json(posts);
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: '서버 오류' });
+    }
+});
+
+// 게시물 상세 조회 API
+app.get('/posts/:id', async (req, res) => {
+    const { id } = req.params;
+
+    try {
+        const [post] = await db.promise().execute(`
+            SELECT 
+                posts.id, 
+                posts.title, 
+                posts.content, 
+                posts.created_at, 
+                posts.updated_at,
+                users.email AS author_email,
+                clubs.name AS club_name
+            FROM posts
+            JOIN users ON posts.author_id = users.id
+            JOIN clubs ON posts.club_id = clubs.id
+            WHERE posts.id = ?
+        `, [id]);
+
+        if (post.length === 0) {
+            return res.status(404).json({ message: '게시글을 찾을 수 없습니다.' });
+        }
+
+        res.json(post[0]);
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: '서버 오류' });
+    }
+});
+
+
+app.post('/comments', async (req, res) => {
+    const { content, author_id, post_id } = req.body;
+
+    // 필수 입력값 확인
+    if (!content || !author_id || !post_id) {
+        return res.status(400).json({ message: 'content, author_id, post_id는 필수입니다.' });
+    }
+
+    try {
+        // 작성하려는 게시글이 존재하는지 확인
+        const [post] = await db.promise().execute('SELECT id FROM posts WHERE id = ?', [post_id]);
+        if (post.length === 0) {
+            return res.status(404).json({ message: '존재하지 않는 게시글입니다.' });
+        }
+
+        // 작성자가 유효한 사용자인지 확인
+        const [author] = await db.promise().execute('SELECT id FROM users WHERE id = ?', [author_id]);
+        if (author.length === 0) {
+            return res.status(404).json({ message: '존재하지 않는 사용자입니다.' });
+        }
+
+        // 댓글 작성
+        const [result] = await db.promise().execute(
+            'INSERT INTO comments (content, author_id, post_id) VALUES (?, ?, ?)',
+            [content, author_id, post_id]
+        );
+
+        res.status(201).json({ message: '댓글이 성공적으로 작성되었습니다.', comment_id: result.insertId });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: '서버 오류' });
+    }
+});
 
 // 서버 시작
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
     console.log(`서버가 포트 ${PORT}에서 실행 중입니다.`);
 });
+
 
 
