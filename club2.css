@@ -1,0 +1,128 @@
+/* ClubPage.css */
+
+#wrapper {
+    width: 100%;
+    height: 100%;
+}
+
+#main {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.inner {
+    width: 100%;
+    max-width: 1200px;
+    padding: 20px;
+}
+
+#header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px;
+    background-color: #f8f8f8;
+}
+
+.logo img {
+    width: 150px;
+}
+
+.icons {
+    list-style: none;
+}
+
+input[type="text"] {
+    padding: 5px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    width: 200px;
+}
+
+button {
+    margin-left: 5px;
+    padding: 5px 10px;
+    background-color: white;
+    color: black;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+button:hover {
+    background-color: #f0f0f0;
+}
+
+.main h1 {
+    font-size: 36px;
+    margin: 20px 0;
+}
+
+.image.main img {
+    width: 60%;
+    height: 310px;
+}
+
+hr.major {
+    border: 1px solid #ddd;
+    margin: 20px 0;
+}
+
+.lnb-list {
+    list-style: none;
+    padding: 0;
+}
+
+.accordion {
+    background-color: #f1f1f1;
+    border: none;
+    padding: 10px;
+    text-align: left;
+    width: 100%;
+    cursor: pointer;
+}
+
+.panel {
+    display: none;
+    padding: 0 18px;
+    background-color: #f9f9f9;
+    overflow: hidden;
+}
+
+.contents-block-in {
+    padding: 20px 0;
+}
+
+.club-icon-map {
+    font-size: 16px;
+}
+
+.club-map-list .row {
+    display: flex;
+    justify-content: space-around;
+}
+
+.thumb {
+    border: 1px solid #ddd;
+    padding: 10px;
+    text-align: center;
+}
+
+.thumb img {
+    width: 100%;
+    height: auto;
+}
+
+.thumb p {
+    margin-top: 10px;
+}
+
+.thumb a {
+    text-decoration: none;
+}
+
+.thumb strong {
+    display: block;
+    margin-top: 5px;
+}
